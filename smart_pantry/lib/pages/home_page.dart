@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:smart_pantry/constants/colors.dart';
+import 'package:smart_pantry/routes/routes.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 
 class HomePage extends StatefulWidget {
@@ -9,8 +11,8 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   double weight = 0.0;
-  String productName = 'Loading...';
-  String expiryDate = 'Loading...';
+  String productName = 'No item added';
+  String expiryDate = 'No item added';
 
   final DatabaseReference _dbRef = FirebaseDatabase.instance.ref('pantry');
 
@@ -23,34 +25,46 @@ class _HomePageState extends State<HomePage> {
   void _listenToPantryData() {
     _dbRef.onValue.listen((DatabaseEvent event) {
       final data = event.snapshot.value as Map?;
-      if (data != null) {
+      if (data != null && data.containsKey('item') && data['item'].toString().isNotEmpty) {
         setState(() {
           weight = double.tryParse(data['weight(g)'].toString()) ?? 0.0;
-          productName = data['item'] ?? 'Unknown';
-          expiryDate = data['expiry'] ?? 'Unknown';
+          productName = data['item'] ?? 'No item added';
+          expiryDate = data['expiry'] ?? 'No item added';
+        });
+      } else {
+        setState(() {
+          weight = 0.0;
+          productName = 'No item added';
+          expiryDate = 'No item added';
         });
       }
     });
+  }
+
+  void _navigateToAddItem() {
+    Navigator.pushNamed(context, AppRoutes.ADDITEM);
   }
 
   @override
   Widget build(BuildContext context) {
     final bool isLowWeight = weight < 200.0;
 
-    final Color primaryColor = const Color(0xFF00796B); // Teal
-    final Color accentColor = const Color(0xFFB2DFDB); // Light mint
-    final Color warningColor = const Color(0xFFE57373); // Light red
-    final Color bgColor = const Color(0xFFF1F8F6); // Soft background
-
     return Scaffold(
-      backgroundColor: bgColor,
+      backgroundColor: AppColors.Aqua,
       appBar: AppBar(
-        title: const Text('Smart Pantry System',
-        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),),
-        backgroundColor: primaryColor,
+        title: const Text(
+          'Smart Pantry System',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: AppColors.Teal,
         centerTitle: true,
         elevation: 4,
         automaticallyImplyLeading: false,
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _navigateToAddItem,
+        backgroundColor: AppColors.Teal,
+        child: const Icon(Icons.add, color: Colors.white),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),
@@ -72,12 +86,12 @@ class _HomePageState extends State<HomePage> {
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: accentColor,
+                        color: AppColors.Mint,
                       ),
                       child: Icon(
                         Icons.shopping_bag_rounded,
                         size: 60,
-                        color: primaryColor,
+                        color: AppColors.Teal,
                       ),
                     ),
                     const SizedBox(height: 20),
@@ -103,8 +117,6 @@ class _HomePageState extends State<HomePage> {
                       ],
                     ),
                     const SizedBox(height: 30),
-
-                    // START OF ANIMATED GAUGE
                     TweenAnimationBuilder<double>(
                       tween: Tween<double>(begin: 0, end: weight),
                       duration: const Duration(milliseconds: 800),
@@ -125,7 +137,7 @@ class _HomePageState extends State<HomePage> {
                                 GaugeRange(
                                   startValue: 0,
                                   endValue: 200,
-                                  color: warningColor,
+                                  color: Colors.redAccent.shade100,
                                   startWidth: 0.2,
                                   endWidth: 0.2,
                                   sizeUnit: GaugeSizeUnit.factor,
@@ -133,7 +145,7 @@ class _HomePageState extends State<HomePage> {
                                 GaugeRange(
                                   startValue: 200,
                                   endValue: 500,
-                                  color: Colors.amberAccent.shade100,
+                                  color: AppColors.YellowAccent,
                                   startWidth: 0.2,
                                   endWidth: 0.2,
                                   sizeUnit: GaugeSizeUnit.factor,
@@ -141,7 +153,7 @@ class _HomePageState extends State<HomePage> {
                                 GaugeRange(
                                   startValue: 500,
                                   endValue: 1000,
-                                  color: Colors.greenAccent.shade100,
+                                  color: AppColors.Mint,
                                   startWidth: 0.2,
                                   endWidth: 0.2,
                                   sizeUnit: GaugeSizeUnit.factor,
@@ -150,8 +162,8 @@ class _HomePageState extends State<HomePage> {
                               pointers: <GaugePointer>[
                                 NeedlePointer(
                                   value: animatedWeight,
-                                  needleColor: primaryColor,
-                                  knobStyle: KnobStyle(color: primaryColor),
+                                  needleColor: AppColors.Teal,
+                                  knobStyle: KnobStyle(color: AppColors.Teal),
                                 ),
                               ],
                               annotations: <GaugeAnnotation>[
@@ -177,26 +189,24 @@ class _HomePageState extends State<HomePage> {
                         );
                       },
                     ),
-                    // END OF ANIMATED GAUGE
-
                     if (isLowWeight)
                       Container(
                         margin: const EdgeInsets.only(top: 30),
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                         decoration: BoxDecoration(
-                          color: warningColor.withOpacity(0.1),
+                          color: Colors.redAccent.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: warningColor),
+                          border: Border.all(color: Colors.redAccent),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(Icons.warning_amber_rounded, color: warningColor),
+                            Icon(Icons.warning_amber_rounded, color: Colors.redAccent),
                             const SizedBox(width: 10),
                             Text(
                               'Weight is below 200g!',
                               style: TextStyle(
-                                color: warningColor,
+                                color: Colors.redAccent,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
