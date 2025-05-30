@@ -106,7 +106,7 @@ class _SplashScreenState extends State<SplashScreen>
                     ),
                     const SizedBox(height: 24),
                     Text(
-                      'Smart Pantry System',
+                      'GrubGuard',
                       style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.w700,

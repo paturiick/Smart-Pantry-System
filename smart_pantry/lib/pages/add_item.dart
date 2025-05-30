@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:intl/intl.dart';
 import 'package:smart_pantry/constants/colors.dart';
+import 'package:smart_pantry/routes/routes.dart';
 
 class AddItemPage extends StatefulWidget {
   @override
@@ -24,7 +25,7 @@ class _AddItemPageState extends State<AddItemPage> {
 
     final itemData = {
       'item': _itemController.text.trim(),
-      'weight(g)': double.parse(_weightController.text),
+      'known_weight': double.parse(_weightController.text),
       'expiry': DateFormat('MMM dd, yyyy').format(_expiryDate!),
     };
 
@@ -51,13 +52,13 @@ class _AddItemPageState extends State<AddItemPage> {
                 children: [
                   Text("📌 RFID: $uid"),
                   Text("🛒 Item: ${savedData['item']}"),
-                  Text("⚖️ Weight: ${savedData['weight(g)']} g"),
+                  Text("⚖️ Weight: ${savedData['known_weight']} g"),
                   Text("📅 Expiry: ${savedData['expiry']}"),
                 ],
               ),
               actions: [
                 TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
+                  onPressed: () => Navigator.pushNamed(context, AppRoutes.HOMEPAGE),
                   child: Text('OK', style: TextStyle(color: AppColors.Teal)),
                 )
               ],
