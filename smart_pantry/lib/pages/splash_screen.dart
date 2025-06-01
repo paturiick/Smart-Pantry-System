@@ -3,6 +3,7 @@ import 'package:flutter_custom_clippers/flutter_custom_clippers.dart';
 import 'package:animated_background/animated_background.dart';
 import 'package:smart_pantry/routes/routes.dart';
 import 'package:smart_pantry/controllers/splash_screen_controller.dart';
+
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
@@ -98,10 +99,10 @@ class _SplashScreenState extends State<SplashScreen>
                           ),
                         ],
                       ),
-                      child: Icon(
-                        Icons.shopping_bag,
-                        color: _controller.primaryColor,
-                        size: 64,
+                      child: Image.asset(
+                        'assets/icons/GrubGuard.png',
+                        width: 64,
+                        height: 64,
                       ),
                     ),
                     const SizedBox(height: 24),

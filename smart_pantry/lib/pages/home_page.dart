@@ -49,7 +49,7 @@ class _HomePageState extends State<HomePage> {
       backgroundColor: AppColors.Aqua,
       appBar: AppBar(
         title: const Text(
-          'Smart Pantry System',
+          'GrubGuard',
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         backgroundColor: AppColors.Teal,

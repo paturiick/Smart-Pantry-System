@@ -41,6 +41,8 @@ class AddItemController {
       'expiry': DateFormat('MMM dd, yyyy').format(expiryDate!),
     };
 
+    // ✅ Clear previous UID and temp scan data
+    await _db.child('last_scanned_uid').remove();
     await _db.child('temp_scan').set(itemData);
     await _db.child('scan_trigger').set(true);
 
@@ -53,13 +55,10 @@ class AddItemController {
     VoidCallback onSuccess,
   ) {
     _scanSubscription?.cancel();
-    _scanSubscription = _db.child('last_scanned_uid').onValue.listen((
-      event,
-    ) async {
+    _scanSubscription = _db.child('last_scanned_uid').onValue.listen((event) async {
       final uid = event.snapshot.value?.toString();
       if (uid != null && uid.isNotEmpty) {
         _scanSubscription?.cancel();
-        await _db.child('last_scanned_uid').remove();
 
         if (uid == "ALREADY_USED") {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -74,7 +73,10 @@ class AddItemController {
 
         isScanning = false;
 
+        // ✅ Save item under UID and update last_scanned_uid
         await _db.child('pantry/$uid').set(itemData);
+        await _db.child('last_scanned_uid').set(uid);
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('✅ Item added to pantry!'),
@@ -83,6 +85,9 @@ class AddItemController {
         );
 
         await _db.child('temp_scan').remove(); // Clean up
+        await Future.delayed(const Duration(milliseconds: 500));
+        await _db.child('scan_trigger').set(false);
+
         onSuccess();
       }
     });

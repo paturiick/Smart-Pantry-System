@@ -1,11 +1,11 @@
-import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/material.dart';
 
 class HomePageController {
-  final DatabaseReference _dbRef = FirebaseDatabase.instance.ref('pantry');
+  final db = FirebaseDatabase.instance.ref();
 
   void listenToPantryData({
-    required void Function({
+    required Function({
       required double weight,
       required String productName,
       required String expiryDate,
@@ -13,32 +13,36 @@ class HomePageController {
     })
     onData,
   }) {
-    _dbRef.orderByKey().limitToLast(1).onValue.listen((DatabaseEvent event) {
-      final data = event.snapshot.value as Map?;
+    // Listen to last scanned UID
+    db.child('last_scanned_uid').onValue.listen((event) {
+      final String? rfid = event.snapshot.value?.toString();
 
-      if (data != null && data.isNotEmpty) {
-        final latestEntry = data.entries.first;
-        final rfid = latestEntry.key;
-        final itemData = latestEntry.value as Map;
+      if (rfid != null && rfid.isNotEmpty) {
+        // Read item data from pantry path
+        db.child('pantry/$rfid').onValue.listen((itemSnap) {
+          final data = itemSnap.snapshot.value as Map?;
 
-        onData(
-          weight: double.tryParse(itemData['known_weight'].toString()) ?? 0.0,
-          productName: itemData['item'] ?? 'No item added',
-          expiryDate: itemData['expiry'] ?? 'No item added',
-          rfid: rfid,
-        );
-      } else {
-        onData(
-          weight: 0.0,
-          productName: 'No item added',
-          expiryDate: 'No item added',
-          rfid: 'No tag scanned',
-        );
+          if (data != null) {
+            final double weight = double.tryParse(
+                  data['current_weight']?.toString() ?? '0.0',
+                ) ??
+                0.0;
+            final String item = data['item']?.toString() ?? 'No item added';
+            final String expiry = data['expiry']?.toString() ?? 'No expiry';
+
+            onData(
+              weight: weight,
+              productName: item,
+              expiryDate: expiry,
+              rfid: rfid,
+            );
+          }
+        });
       }
     });
   }
 
-  void navigateToAddItem(BuildContext context, String routeName) {
-    Navigator.pushNamed(context, routeName);
+  void navigateToAddItem(BuildContext context, String route) {
+    Navigator.pushNamed(context, route);
   }
 }

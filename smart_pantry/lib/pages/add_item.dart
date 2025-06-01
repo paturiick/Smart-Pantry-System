@@ -88,7 +88,7 @@ class _AddItemPageState extends State<AddItemPage> {
                         ElevatedButton(
                           onPressed: () {
                             _controller.pickDate(context, (picked) {
-                              setState(() {}); // update display
+                              setState(() {});
                             });
                           },
                           style: ElevatedButton.styleFrom(
@@ -116,13 +116,15 @@ class _AddItemPageState extends State<AddItemPage> {
                               Navigator.pushNamed(context, AppRoutes.HOMEPAGE);
                             }
                           });
-                          setState(() {}); // update isScanning
+                          setState(() {}); // reflect scanning state change
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.Teal,
                           foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 20, vertical: 14),
+                            horizontal: 20,
+                            vertical: 14,
+                          ),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(14),
                           ),
