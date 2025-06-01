@@ -103,8 +103,37 @@ class _AddItemPageState extends State<AddItemPage> {
                 ),
               ),
               const SizedBox(height: 20),
+
+              /// Scan or Cancel Buttons
               _controller.isScanning
-                  ? const CircularProgressIndicator()
+                  ? Column(
+                      children: [
+                        const CircularProgressIndicator(),
+                        const SizedBox(height: 16),
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton.icon(
+                            icon: const Icon(Icons.cancel),
+                            label: const Text('Cancel Scan'),
+                            onPressed: () async {
+                              await _controller.cancelScan(context);
+                              setState(() {}); // refresh UI
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.red,
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 20,
+                                vertical: 14,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    )
                   : SizedBox(
                       width: double.infinity,
                       child: ElevatedButton.icon(
@@ -116,7 +145,7 @@ class _AddItemPageState extends State<AddItemPage> {
                               Navigator.pushNamed(context, AppRoutes.HOMEPAGE);
                             }
                           });
-                          setState(() {}); // reflect scanning state change
+                          setState(() {});
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.Teal,

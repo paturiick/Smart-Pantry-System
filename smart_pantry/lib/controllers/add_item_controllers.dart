@@ -54,26 +54,30 @@ class AddItemController {
     Map<String, dynamic> itemData,
     VoidCallback onSuccess,
   ) {
+    bool alreadyWarned = false;
+
     _scanSubscription?.cancel();
     _scanSubscription = _db.child('last_scanned_uid').onValue.listen((event) async {
       final uid = event.snapshot.value?.toString();
-      if (uid != null && uid.isNotEmpty) {
-        _scanSubscription?.cancel();
 
+      if (uid != null && uid.isNotEmpty) {
         if (uid == "ALREADY_USED") {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('⚠️ RFID already linked. Scan a different tag.'),
-            ),
-          );
-          await _db.child('scan_trigger').set(true); // Re-trigger scanning
-          _listenForScan(context, itemData, onSuccess);
+          if (!alreadyWarned) {
+            alreadyWarned = true;
+
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('⚠️ RFID already linked. Scan a different tag.'),
+              ),
+            );
+          }
           return;
         }
 
+        // ✅ Valid UID scanned
+        _scanSubscription?.cancel();
         isScanning = false;
 
-        // ✅ Save item under UID and update last_scanned_uid
         await _db.child('pantry/$uid').set(itemData);
         await _db.child('last_scanned_uid').set(uid);
 
@@ -84,13 +88,26 @@ class AddItemController {
           ),
         );
 
-        await _db.child('temp_scan').remove(); // Clean up
+        await _db.child('temp_scan').remove();
         await Future.delayed(const Duration(milliseconds: 500));
         await _db.child('scan_trigger').set(false);
 
         onSuccess();
       }
     });
+  }
+
+  Future<void> cancelScan(BuildContext context) async {
+    isScanning = false;
+    _scanSubscription?.cancel();
+
+    await _db.child('scan_trigger').set(false);
+    await _db.child('last_scanned_uid').set("CANCELLED");
+    await _db.child('temp_scan').remove();
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('❌ Scan cancelled.')),
+    );
   }
 
   Future<void> pickDate(
