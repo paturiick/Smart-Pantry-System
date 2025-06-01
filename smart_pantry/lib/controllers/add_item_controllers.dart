@@ -57,7 +57,9 @@ class AddItemController {
     bool alreadyWarned = false;
 
     _scanSubscription?.cancel();
-    _scanSubscription = _db.child('last_scanned_uid').onValue.listen((event) async {
+    _scanSubscription = _db.child('last_scanned_uid').onValue.listen((
+      event,
+    ) async {
       final uid = event.snapshot.value?.toString();
 
       if (uid != null && uid.isNotEmpty) {
@@ -104,9 +106,18 @@ class AddItemController {
     await _db.child('scan_trigger').set(false);
     await _db.child('last_scanned_uid').set("CANCELLED");
     await _db.child('temp_scan').remove();
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('❌ Scan cancelled.')),
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Scan Cancelled'),
+        content: const Text('The RFID scan was cancelled.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
     );
   }
 
