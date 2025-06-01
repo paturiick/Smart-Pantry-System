@@ -28,7 +28,10 @@ class HomePageController {
     db.child('last_scanned_uid').onValue.listen((event) {
       final String? rfid = event.snapshot.value?.toString();
 
-      if (rfid != null && rfid.isNotEmpty) {
+      if (rfid != null &&
+          rfid.isNotEmpty &&
+          rfid != "CANCELLED" &&
+          rfid != "ALREADY_USED") {
         _fetchPantryItemData(rfid, onData);
       }
     });
@@ -48,9 +51,8 @@ class HomePageController {
       final data = itemSnap.snapshot.value as Map?;
 
       if (data != null) {
-        final double weight = double.tryParse(
-              data['current_weight']?.toString() ?? '0.0',
-            ) ?? 0.0;
+        final double weight =
+            double.tryParse(data['current_weight']?.toString() ?? '0.0') ?? 0.0;
         final String item = data['item']?.toString() ?? 'No item added';
         final String expiry = data['expiry']?.toString() ?? 'No expiry';
 
@@ -68,11 +70,13 @@ class HomePageController {
     Navigator.pushNamed(context, route);
   }
 
-  void triggerRFIDScan() async {
+  Future<void> triggerRFIDScan() async {
+    await db.child('last_scanned_uid').set("");
     await db.child('scan_trigger').set(true);
   }
 
-  void triggerRFIDScanCancel() async {
+  Future<void> triggerRFIDScanCancel() async {
+    await db.child('last_scanned_uid').set("CANCELLED");
     await db.child('scan_trigger').set(false);
   }
 }

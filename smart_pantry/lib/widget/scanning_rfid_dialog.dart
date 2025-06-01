@@ -6,8 +6,6 @@ class ScanningRFIDDialog extends StatelessWidget {
   final HomePageController controller;
 
   const ScanningRFIDDialog({super.key, required this.controller});
-
-  /// Static method to show the dialog and trigger the scan
   static Future<void> show(
     BuildContext context,
     HomePageController controller,

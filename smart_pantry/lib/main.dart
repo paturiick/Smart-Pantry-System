@@ -3,26 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:smart_pantry/firebase_options.dart';
 import 'package:smart_pantry/pages/splash_screen.dart';
 import 'package:smart_pantry/routes/pages.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:timezone/data/latest.dart' as tz;
-import 'package:timezone/timezone.dart' as tz;
+import 'package:smart_pantry/services/notification_service.dart';
 
-final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-    FlutterLocalNotificationsPlugin();
+final NotificationService notificationService = NotificationService();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  tz.initializeTimeZones();
-
-  const AndroidInitializationSettings initializationSettingsAndroid =
-      AndroidInitializationSettings('@mipmap/ic_launcher');
-
-  const InitializationSettings initializationSettings = InitializationSettings(
-    android: initializationSettingsAndroid,
-  );
-
-  await flutterLocalNotificationsPlugin.initialize(initializationSettings);
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await notificationService.init();
   runApp(const MyApp());
 }
 

@@ -13,25 +13,25 @@ class SplashScreenController {
   final Color bgColor = const Color(0xFFE0F2F1);
 
   SplashScreenController({required TickerProvider vsync})
-      : mainController = AnimationController(
+    : mainController = AnimationController(
+        vsync: vsync,
+        duration: const Duration(milliseconds: 1500),
+      ),
+      scaleAnimation = CurvedAnimation(
+        parent: AnimationController(
           vsync: vsync,
           duration: const Duration(milliseconds: 1500),
-        ),
-        scaleAnimation = CurvedAnimation(
-          parent: AnimationController(
-            vsync: vsync,
-            duration: const Duration(milliseconds: 1500),
-          )..forward(),
-          curve: Curves.elasticOut,
-        ),
-        fadeAnimation = CurvedAnimation(
-          parent: AnimationController(
-            vsync: vsync,
-            duration: const Duration(milliseconds: 1500),
-          )..forward(),
-          curve: Curves.easeIn,
-        ),
-        icons = List.generate(10, (index) => _FloatingIcon(vsync: vsync)) {
+        )..forward(),
+        curve: Curves.elasticOut,
+      ),
+      fadeAnimation = CurvedAnimation(
+        parent: AnimationController(
+          vsync: vsync,
+          duration: const Duration(milliseconds: 1500),
+        )..forward(),
+        curve: Curves.easeIn,
+      ),
+      icons = List.generate(10, (index) => _FloatingIcon(vsync: vsync)) {
     mainController.forward();
   }
 
@@ -53,23 +53,23 @@ class _FloatingIcon {
   final Color color;
 
   _FloatingIcon({required TickerProvider vsync})
-      : controller = AnimationController(
-          vsync: vsync,
-          duration: Duration(milliseconds: 4000 + Random().nextInt(3000)),
-        ),
-        left = Random().nextDouble() * 300,
-        icon = _icons[Random().nextInt(_icons.length)],
-        size = 24 + Random().nextDouble() * 20,
-        color = _iconColors[Random().nextInt(_iconColors.length)],
-        animation = Tween<double>(begin: 1.2, end: -0.2).animate(
-          CurvedAnimation(
-            parent: AnimationController(
-              vsync: vsync,
-              duration: Duration(milliseconds: 4000 + Random().nextInt(3000)),
-            ),
-            curve: Curves.easeInOut,
+    : controller = AnimationController(
+        vsync: vsync,
+        duration: Duration(milliseconds: 4000 + Random().nextInt(3000)),
+      ),
+      left = Random().nextDouble() * 300,
+      icon = _icons[Random().nextInt(_icons.length)],
+      size = 40 + Random().nextDouble() * 40, // <- increased here
+      color = _iconColors[Random().nextInt(_iconColors.length)],
+      animation = Tween<double>(begin: 1.2, end: -0.2).animate(
+        CurvedAnimation(
+          parent: AnimationController(
+            vsync: vsync,
+            duration: Duration(milliseconds: 4000 + Random().nextInt(3000)),
           ),
-        ) {
+          curve: Curves.easeInOut,
+        ),
+      ) {
     controller.repeat(reverse: false);
   }
 
