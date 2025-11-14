@@ -1,47 +1,70 @@
-Restaurant Pantry System
+# Restaurant Pantry System  
+### IoT-Based Inventory Tracking and Automation
 
-An IoT-based inventory tracking system for restaurants that uses RFID tags, weight sensors, Arduino microcontrollers, Firebase, and a Flutter mobile app. The system monitors pantry items in real time, detects usage through weight changes, verifies removed items, and updates inventory automatically to reduce waste and prevent stockouts.
+The **Restaurant Pantry System** is an IoT-powered inventory management solution designed to automate stock monitoring, track item usage in real time, and notify kitchen staff when supplies reach critical levels. This system integrates hardware sensors, RFID technology, weight monitoring, and a mobile application to deliver a smarter and more efficient kitchen workflow.
 
-Features
+---
 
-RFID-based item identification
+## Features
 
-Real-time weight monitoring using load cells (HX711)
+### 🔹 Real-Time Inventory Tracking
+* RFID tags identify each pantry item uniquely.  
+* Weight sensors continuously monitor remaining stock.  
+* Automatic updates sent directly to the mobile app.
 
-Detection of slow consumption vs. sudden item removal
+### 🔹 Smart Alerts & Notifications
+* Alerts are triggered when item weight drops below a threshold (e.g., 200g).  
+* Detects abnormal weight drops and warns staff immediately.  
+* Notifies the staff when an item is removed and requires RFID verification.
 
-Low-stock alerts (example threshold: 200 g)
+### 🔹 Mobile App Integration
+* Built with Flutter and connected to Firebase.  
+* Displays item information: name, weight graph, expiry date, and daily usage.  
+* Allows kitchen staff to verify RFID tags and update pantry entries.
 
-Automated verification on removal via RFID scan
+### 🔹 Hardware Automation
+* Arduino-based system with:
+  - Load cell for weight detection  
+  - RFID module for tag scanning  
+  - Buzzer for controlled alerts  
+  - Wi-Fi module for cloud syncing  
+* Smart logic avoids false alarms during sudden item removal.
 
-Flutter mobile app for viewing items, weight graphs, images, and alerts
+---
 
-Firebase Firestore for cloud storage and real-time synchronization
+## How It Works
 
-Overview
+1. **User scans the RFID tag** for an item during setup.  
+2. **Item data is stored in Firebase**, including name, expiry, and initial weight.  
+3. **Load cells track weight changes** as the item is used.  
+4. **System sends alerts** if weight becomes too low or decreases abnormally.  
+5. When the item is taken out:
+   - Arduino prompts the user for **RFID re-scan**  
+   - UID is **verified with Firebase**  
+   - Result is sent back to the app
 
-Each pantry item is tagged with an RFID sticker and placed on a load cell. An Arduino (ESP32/ESP8266 recommended) reads the RFID UID and measures weight through the HX711 amplifier. Weight and tag data are sent to Firebase, where the Flutter app retrieves and displays current item status, weight history, and notifications. Sudden large weight drops trigger a verification request; the Arduino scans the RFID tag and confirms the removal before the database is updated.
+---
 
-How it works
+## Technologies Used
 
-Register an item by scanning its RFID tag and entering details in the Flutter app. Data is saved to Firebase.
+### **Hardware**
+* Arduino + Load Cells  
+* RFID-RC522 Module  
+* HX711 Amplifier  
+* Buzzer + LEDs  
+* Wi-Fi Module (ESP8266/ESP32)
 
-Arduino continuously measures weight and reports updates to Firebase.
+### **Software**
+* Flutter (mobile application)  
+* Firebase Firestore  
+* Firebase Authentication  
+* Firebase Realtime Communication  
+* Arduino C++ Firmware  
 
-Normal usage appears as a gradual weight decrease; sudden drops trigger verification.
+---
 
-On verification, Arduino confirms the RFID UID with Firebase before marking the item removed.
-
-When weight falls below a preset threshold, the system sends a low-stock alert to the app.
-
-Components & Technologies
-
-Arduino (ESP32 or ESP8266) — microcontroller with WiFi
-
-RC522 RFID reader — reads RFID tag UIDs
-
-Load cell + HX711 amplifier — measures weight
-
-Flutter — mobile application for UI and controls
-
-Firebase Firestore — cloud database for storage and real-time sync
+## Future Enhancements
+* Predictive restocking using AI-based usage forecasting  
+* Multi-shelf tracking and grouping  
+* Supplier integration for auto-ordering  
+* Advanced analytics dashboard for restaurants
